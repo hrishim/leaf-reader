@@ -12,7 +12,7 @@ import WebKit
   let b:[String:Any] = ["id":"b","title":"Second","url":"https://example.com/b","feed":"https://example.com/rss"]
   reader.articles=[a,b];reader.read=["a","b"];reader.selected=a;reader.articleBlocks=[["type":"p","text":"STALE ARTICLE MUST DISAPPEAR"]];reader.bodyStatus="loading";reader.fetchSerial=41;reader.search.stringValue="First"
   reader.showUnreadAfterMarkAll()
-  assert(reader.currentFilter=="unread");assert(reader.visible.isEmpty);assert(reader.selected==nil);assert(reader.articleBlocks.isEmpty);assert(reader.fetchSerial>41);assert(reader.search.stringValue.isEmpty);assert(reader.readControl?.isEnabled==false)
+  assert(reader.currentFilter=="unread");assert(reader.store.state["currentFilter"] as? String=="unread","Unread view persists after Mark All Read");assert(reader.visible.isEmpty);assert(reader.selected==nil);assert(reader.articleBlocks.isEmpty);assert(reader.fetchSerial>41);assert(reader.search.stringValue.isEmpty);assert(reader.readControl?.isEnabled==false)
   reader.currentFilter="all";reader.rebuildList();assert(reader.visible.count==2,"Read history remains available explicitly")
   reader.contextArticle=b;reader.contextToggleRead();assert(!reader.read.contains("b"));assert(reader.read.contains("a"),"Context action must affect its own article")
   reader.currentFilter="unread";reader.showUnreadAfterMarkAll();assert(reader.visible.count==1,"Partial completion preserves unread articles")
