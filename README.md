@@ -17,3 +17,11 @@ Create a public repository, push `main`, then choose **Settings → Pages → So
 Run `node --test tests/*.test.mjs`. Browser verification must also cover live feed loading, article extraction, persistence, offline saved reading and responsive layout; static checks alone do not establish those behaviors.
 
 Mozilla Readability is bundled with its Apache 2.0 licence in `web/vendor/Readability-LICENSE.md`. The app source is kept separate from the earlier hosted service and native Mac build.
+
+## Native Mac app
+
+The standalone AppKit source is in `mac/`. Build on macOS with `zsh scripts/build-mac.sh`; compiler caches and temporary files use the external workspace volume. Run `zsh scripts/test-mac-display.sh` for isolated native display tests.
+
+Version 1.2 clears the current article and switches to Unread after Mark All Read. Read history is still available through All articles. In-flight extraction cannot restore a cleared article. Article right-click menus provide read/unread, Read Later, Mark Below as Read, Copy Link, Copy Article Text, Email and Open in Browser. Feed right-click menus provide Open Website, Refresh, Mark Feed Read, Edit and Remove. This implements those core actions; it does not claim complete feature parity with Reeder.
+
+The web update labels mobile Feeds/Articles navigation and uses Hindu Tamil's publisher-supplied RSS article body when its webpage exceeds the free relay's size limit.

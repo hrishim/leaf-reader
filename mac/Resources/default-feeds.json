@@ -1,0 +1,54 @@
+[
+  {
+    "name": "9to5Mac » Mac",
+    "url": "https://9to5mac.com/feed/"
+  },
+  {
+    "name": "BusinessLine — Companies",
+    "url": "https://www.thehindubusinessline.com/companies/feeder/default.rss"
+  },
+  {
+    "name": "BusinessLine — Editorial",
+    "url": "https://www.thehindubusinessline.com/opinion/editorial/feeder/default.rss"
+  },
+  {
+    "name": "BusinessLine — Special",
+    "url": "https://www.thehindubusinessline.com/specials/feeder/default.rss"
+  },
+  {
+    "name": "Hindu Tamil",
+    "url": "https://www.hindutamil.in/feed/"
+  },
+  {
+    "name": "MacRumors",
+    "url": "https://feeds.macrumors.com/MacRumors-All"
+  },
+  {
+    "name": "OpIndia.com",
+    "url": "https://www.opindia.com/feed/"
+  },
+  {
+    "name": "Swarajya",
+    "url": "http://swarajyamag.com/feed/"
+  },
+  {
+    "name": "The Commune",
+    "url": "https://thecommunemag.com/feed/"
+  },
+  {
+    "name": "The New Indian Express — Bengaluru",
+    "url": "https://www.newindianexpress.com/cities/bengaluru/"
+  },
+  {
+    "name": "The New Indian Express — Nation",
+    "url": "https://www.newindianexpress.com/india/"
+  },
+  {
+    "name": "The New Indian Express — Tamil Nadu",
+    "url": "https://www.newindianexpress.com/states/tamil-nadu/"
+  },
+  {
+    "name": "WIRED",
+    "url": "https://www.wired.com/feed/rss"
+  }
+]

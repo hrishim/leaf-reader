@@ -1,0 +1,23 @@
+import AppKit
+import WebKit
+@main final class DisplayRegressionTests:NSObject,NSApplicationDelegate,WKNavigationDelegate {
+ var reader:LeafReader!
+ static func main(){let app=NSApplication.shared;let delegate=DisplayRegressionTests();app.delegate=delegate;app.run();withExtendedLifetime(delegate){}}
+ func applicationDidFinishLaunching(_ note:Notification){do{
+  let root=URL(fileURLWithPath:"/Volumes/codex_Extender/Work/leaf-tmp").appendingPathComponent("display-regression-"+UUID().uuidString)
+  reader=LeafReader();reader.store=try ReaderStore(directory:root);reader.ready=true
+  reader.list.dataSource=reader;reader.list.delegate=reader;reader.sidebar.dataSource=reader;reader.sidebar.delegate=reader
+  reader.readControl=NSButton();reader.laterControl=NSButton();reader.detail.navigationDelegate=self
+  let a:[String:Any] = ["id":"a","title":"First","url":"https://example.com/a","feed":"https://example.com/rss"]
+  let b:[String:Any] = ["id":"b","title":"Second","url":"https://example.com/b","feed":"https://example.com/rss"]
+  reader.articles=[a,b];reader.read=["a","b"];reader.selected=a;reader.articleBlocks=[["type":"p","text":"STALE ARTICLE MUST DISAPPEAR"]];reader.bodyStatus="loading";reader.fetchSerial=41;reader.search.stringValue="First"
+  reader.showUnreadAfterMarkAll()
+  assert(reader.currentFilter=="unread");assert(reader.visible.isEmpty);assert(reader.selected==nil);assert(reader.articleBlocks.isEmpty);assert(reader.fetchSerial>41);assert(reader.search.stringValue.isEmpty);assert(reader.readControl?.isEnabled==false)
+  reader.currentFilter="all";reader.rebuildList();assert(reader.visible.count==2,"Read history remains available explicitly")
+  reader.contextArticle=b;reader.contextToggleRead();assert(!reader.read.contains("b"));assert(reader.read.contains("a"),"Context action must affect its own article")
+  reader.currentFilter="unread";reader.showUnreadAfterMarkAll();assert(reader.visible.count==1,"Partial completion preserves unread articles")
+  reader.contextToggleRead();assert(reader.read.contains("b"));reader.showUnreadAfterMarkAll()
+  Timer.scheduledTimer(withTimeInterval:12,repeats:false){_ in fputs("FAIL: timed out rendering empty state\n",stderr);exit(1)}
+ }catch{fputs("FAIL: \(error)\n",stderr);exit(1)}}
+ func webView(_ view:WKWebView,didFinish navigation:WKNavigation!){view.evaluateJavaScript("document.body.innerText"){result,error in guard let text=result as? String,text.contains("All caught up.") else{return};assert(!text.contains("STALE ARTICLE"));print("PASS: Mark All Read clears list and article pane; late extraction invalidated; history retained; partial failures remain visible; context marking targets clicked article");exit(0)}}
+}

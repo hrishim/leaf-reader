@@ -1,0 +1,5 @@
+import Foundation
+enum ReaderLinks {
+ static let services=["Gmail","Outlook on the web","Yahoo Mail","Default Mac mail app"]
+ static func compose(service:String,title:String,body:String)->URL?{var c=URLComponents();switch service{case "Gmail":c=URLComponents(string:"https://mail.google.com/mail/u/0/")!;c.queryItems=[URLQueryItem(name:"view",value:"cm"),URLQueryItem(name:"fs",value:"1"),URLQueryItem(name:"su",value:title),URLQueryItem(name:"body",value:body)];case "Outlook on the web":c=URLComponents(string:"https://outlook.live.com/mail/0/deeplink/compose")!;c.queryItems=[URLQueryItem(name:"subject",value:title),URLQueryItem(name:"body",value:body)];case "Yahoo Mail":c=URLComponents(string:"https://compose.mail.yahoo.com/")!;c.queryItems=[URLQueryItem(name:"subject",value:title),URLQueryItem(name:"body",value:body)];case "Default Mac mail app":c.scheme="mailto";c.queryItems=[URLQueryItem(name:"subject",value:title),URLQueryItem(name:"body",value:body)];default:return nil};return c.url}
+}
