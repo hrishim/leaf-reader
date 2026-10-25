@@ -5,3 +5,7 @@ work/
 /build/
 /qa/
 /outputs/
+/sync-data/
+.env
+.env.*
+!.env.example

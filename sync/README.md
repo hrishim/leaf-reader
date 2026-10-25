@@ -23,7 +23,7 @@ Implemented adapters: Inoreader (registered OAuth), FreshRSS (server API passwor
 
 1. Register Leaf Reader with Inoreader and obtain its own authorized OAuth client configuration. The existing Reeder/NetNewsWire credentials must not be copied. Current Inoreader documentation requires app registration; developer access depends on provider eligibility. No paid upgrade is authorized.
 2. Provide a trusted HTTPS backend callback and secret storage. GitHub Pages only serves static files and cannot hold an OAuth client secret. No hosting account, API credentials or public backend is currently configured.
-3. Add the authenticated backend HTTP/session layer, wire the web and Mac account views to it, store native session credentials in Keychain, and route every read/star action through the account queue. The existing local-only library must remain isolated.
+3. Wire the web and Mac account views to the implemented authenticated backend HTTP/session layer and transport clients, and route every read/star action through the account queue. The existing local-only library must remain isolated. Keychain helpers are implemented but have not been activated with real credentials.
 4. Implement subscription changes (add/remove/move) on provider accounts; current adapters pull subscriptions and push reading/saved state only.
 5. Run real-account tests: mark read in Leaf, observe Inoreader/Reeder/NetNewsWire; reverse it; verify saved state, restart, offline replay, pagination, expired login and disconnect. Test each additional provider against an authorized account before presenting it as supported.
 6. Improve incremental article-body downloads and rate-limit scheduling before enabling large libraries or background polling. Current bounded full pulls are correctness-oriented scaffolding, not an optimized production client.
@@ -41,3 +41,15 @@ Run `node --test tests/sync.test.mjs`. Tests use simulated provider responses; t
 - Feedbin: https://github.com/feedbin/feedbin-api
 - NewsBlur: https://newsblur.com/api
 - FreshRSS: https://freshrss.github.io/FreshRSS/en/developers/06_GoogleReader_API.html
+
+## Backend transport implementation (25 October 2026)
+
+`server.mjs` now provides an authenticated, single-owner HTTP boundary with browser-session cookies and native bearer authentication. It validates Host and browser Origin, limits JSON request size, binds OAuth callbacks to the initiating browser session, rejects unauthenticated account access, and returns no provider secrets. It binds only to loopback; public hosting/TLS is not provisioned or enabled by this code.
+
+Routes: POST/DELETE `/session`; GET `/health`, `/providers`, `/accounts`; POST `/accounts`; GET/DELETE `/accounts/:id`; POST `/accounts/:id/sync`, `/accounts/:id/changes`; POST `/oauth/inoreader/start`; GET `/oauth/inoreader/callback`. Each change has a string `itemId`, a `field` of `read` or `saved`, and a boolean `value`.
+
+`client.mjs` is the shared JavaScript protocol client. `mac/ReaderSyncClient.swift` adds the native HTTPS client and Keychain helpers for the backend access key. Neither client is wired to the released app's controls yet. No provider passwords have been requested, stored or used by this implementation.
+
+The backend operator must configure `LEAF_SYNC_DATA_DIR`, `LEAF_OWNER_KEY` (at least 32 characters), and `LEAF_VAULT_KEY` (base64 for 32 random bytes). Data and credentials use distinct subdirectories. For Inoreader also supply `LEAF_SYNC_ORIGIN` (trusted HTTPS public origin), `INOREADER_CLIENT_ID`, and `INOREADER_CLIENT_SECRET`. Optional `FRESHRSS_API_BASE` is configured on the trusted backend, never accepted as an arbitrary URL from the public API. The loopback port defaults to 8781. Start with `node sync/server.mjs` after supplying configuration securely. Do not place real configuration or credentials in Git.
+
+HTTP integration tests use fake account data and a test-only access key on a temporary loopback port; they test real HTTP transport, not a real provider account. Run `node --test tests/*.test.mjs`. The earlier remaining-work list is still applicable to real provider authorization, protected public deployment, reader UI/data integration and real-account verification; the HTTP boundary and transport clients themselves are now implemented.
