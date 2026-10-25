@@ -33,3 +33,9 @@ test('refresh and restart preserve older read status beyond 1500 articles',async
  assert.equal(restarted.run('merged().filter(match).map(a=>a.id).join()'),'new');
  assert.equal(restarted.run("read.has('read-0')"),true);
 });
+test('bottom menu switches between Read Later, Unread and All Items',()=>{
+ const r=reader();r.run(`articles=[{id:'a',title:'Read'},{id:'b',title:'Unread'}];read.add('a');saved.add('a');`);
+ r.nodes.get('#bottomSaved').onclick();assert.equal(r.run('filter'),'saved');assert.equal(r.run('merged().filter(match).map(a=>a.id).join()'),'a');
+ r.nodes.get('#bottomUnread').onclick();assert.equal(r.run('merged().filter(match).map(a=>a.id).join()'),'b');
+ r.nodes.get('#bottomAll').onclick();assert.equal(r.run('merged().filter(match).length'),2);
+});

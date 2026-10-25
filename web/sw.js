@@ -1,4 +1,4 @@
-const CACHE='leaf-shell-v6';
+const CACHE='leaf-shell-v7';
 const ASSETS=['./','./index.html','./reader.js','./settings.js','./reader-engine.js','./transport.js','./vendor/Readability.js','./favicon.svg','./manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('leaf-shell-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
