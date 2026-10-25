@@ -10,6 +10,9 @@ import WebKit
   reader.readControl=NSButton();reader.laterControl=NSButton();reader.detail.navigationDelegate=self
   let a:[String:Any] = ["id":"a","title":"First","url":"https://example.com/a","feed":"https://example.com/rss"]
   let b:[String:Any] = ["id":"b","title":"Second","url":"https://example.com/b","feed":"https://example.com/rss"]
+  reader.feeds=[["name":"Feed A","url":"https://example.com/rss","folderPath":["News","India"]]]
+  reader.currentScope="@folder:[\"News\"]";assert(reader.inScope(a));reader.currentScope="https://other.example/rss";assert(!reader.inScope(a));reader.currentScope=""
+  assert(reader.sidebarRows.contains{$0.kind=="folder"});let mapped=reader.sidebarRows.firstIndex{$0.feedIndex==0}!;assert(reader.feedIndex(at:mapped)==0)
   reader.articles=[a,b];reader.read=["a","b"];reader.selected=a;reader.articleBlocks=[["type":"p","text":"STALE ARTICLE MUST DISAPPEAR"]];reader.bodyStatus="loading";reader.fetchSerial=41;reader.search.stringValue="First"
   reader.changeReadingSettings(size:32,interfaceSize:18,font:"sans",spacing:1.5,title:1.8,theme:"light")
   assert(reader.store.state["fontSize"] as? Int==32)

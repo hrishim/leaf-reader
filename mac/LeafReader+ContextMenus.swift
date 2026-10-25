@@ -21,10 +21,9 @@ extension LeafReader: NSMenuDelegate {
             item("Email Article…",#selector(contextEmail))
             menu.addItem(.separator());item("Open in Browser",#selector(contextOpenOriginal))
         }else if menu === feedContextMenu {
-            let index=sidebar.clickedRow-4
-            guard feeds.indices.contains(index) else{contextFeedIndex=nil;return}
+            guard let index=feedIndex(at:sidebar.clickedRow),feeds.indices.contains(index) else{contextFeedIndex=nil;return}
             contextFeedIndex=index
-            item("Open Website",#selector(contextOpenFeed));item("Refresh Feed",#selector(contextRefreshFeed))
+            item("Move / Organize Feed…",#selector(organizeFeeds));item("Open Website",#selector(contextOpenFeed));item("Refresh Feed",#selector(contextRefreshFeed))
             item("Mark Feed as Read…",#selector(contextMarkFeed))
             menu.addItem(.separator());item("Edit Subscription…",#selector(contextEditFeed));item("Remove Subscription…",#selector(contextRemoveFeed))
         }
@@ -81,10 +80,10 @@ extension LeafReader: NSMenuDelegate {
         a.accessoryView=stack;a.addButton(withTitle:"Save");a.addButton(withTitle:"Cancel");guard a.runModal() == .alertFirstButtonReturn else{return}
         do{let url=try ReaderNetwork.validated(address.stringValue);let old=feeds[index]["url"] as? String
             guard !feeds.enumerated().contains(where:{$0.offset != index && $0.element["url"] as? String==url.absoluteString}) else{alert("Duplicate feed","That feed is already subscribed.");return}
-            feeds[index]=["name":name.stringValue.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty ? url.host ?? "Feed":name.stringValue,"url":url.absoluteString]
+            let folder=feeds[index]["folderPath"] as? [String] ?? [];feeds[index]=["folderPath":folder,"name":name.stringValue.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty ? url.host ?? "Feed":name.stringValue,"url":url.absoluteString]
             if old != url.absoluteString{articles.removeAll{$0["feed"] as? String==old}}
             persist();sidebar.reloadData();rebuildList();refresh()
         }catch{alert("Invalid feed URL",error.localizedDescription)}
     }
-    @objc func contextRemoveFeed(){guard let index=contextFeedIndex,feeds.indices.contains(index) else{return};sidebar.selectRowIndexes(IndexSet(integer:index+4),byExtendingSelection:false);removeFeed()}
+    @objc func contextRemoveFeed(){guard let index=contextFeedIndex,feeds.indices.contains(index) else{return};sidebar.selectRowIndexes(IndexSet(integer:sidebarRows.firstIndex(where:{$0.feedIndex==index}) ?? 0),byExtendingSelection:false);removeFeed()}
 }

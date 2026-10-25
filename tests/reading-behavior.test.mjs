@@ -5,7 +5,8 @@ import fs from 'node:fs';
 function reader(initial='{"feeds":[]}'){
  const nodes=new Map(),storage=new Map([['leaf-v1',initial],['leaf-reader-mode','off']]);
  const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{textContent:'',innerHTML:'',value:'',dataset:{},style:{},classList:{toggle(){},contains(){return false},remove(){}},setAttribute(){},showModal(){},close(){}});return nodes.get(selector)};
- const context=vm.createContext({document:{querySelector:node,body:{dataset:{},classList:{remove(){}}}},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout:()=>0,clearTimeout(){},navigator:{},window:{addEventListener(){}},leafOpenSettings(){},leafApplyPreferences(){},leafPreferences:{},leafApi:async()=>({items:[]}),readerFeedArticle:()=>null,URL,Date,console});
+ const context=vm.createContext({document:{querySelector:node,body:{dataset:{},classList:{remove(){}}}},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout:()=>0,clearTimeout(){},navigator:{},window:{addEventListener(){}},leafOpenSettings(){},leafApplyPreferences(){},leafPreferences:{},leafApi:async()=>({items:[]}),readerFeedArticle:()=>null,URL,Date,console,confirm:()=>true});
+ vm.runInContext(fs.readFileSync('web/library-model.js','utf8'),context);
  vm.runInContext(fs.readFileSync('web/reader.js','utf8'),context);
  return {run:s=>vm.runInContext(s,context),nodes,storage};
 }
