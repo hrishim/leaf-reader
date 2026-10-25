@@ -16,6 +16,9 @@ import WebKit
   reader.fontSize=19;reader.applyState(reader.store.state);assert(reader.fontSize==32);assert(reader.interfaceFontSize==18);assert(reader.articleFontStyle=="sans")
   reader.showUnreadAfterMarkAll()
   assert(reader.currentFilter=="unread");assert(reader.store.state["currentFilter"] as? String=="unread","Unread view persists after Mark All Read");assert(reader.visible.isEmpty);assert(reader.selected==nil);assert(reader.articleBlocks.isEmpty);assert(reader.fetchSerial>41);assert(reader.search.stringValue.isEmpty);assert(reader.readControl?.isEnabled==false)
+  reader.currentFilter="https://example.com/rss";reader.rebuildList();assert(reader.visible.isEmpty,"Read articles must disappear from feed lists")
+  reader.selected=a;reader.rebuildList();assert(reader.visible.count==1,"The article being read remains visible until moving on")
+  reader.selected=nil
   reader.currentFilter="all";reader.rebuildList();assert(reader.visible.count==2,"Read history remains available explicitly")
   reader.contextArticle=b;reader.contextToggleRead();assert(!reader.read.contains("b"));assert(reader.read.contains("a"),"Context action must affect its own article")
   reader.currentFilter="unread";reader.showUnreadAfterMarkAll();assert(reader.visible.count==1,"Partial completion preserves unread articles")
