@@ -19,6 +19,7 @@ import WebKit
   reader.currentFilter="https://example.com/rss";reader.rebuildList();assert(reader.visible.isEmpty,"Read articles must disappear from feed lists")
   reader.selected=a;reader.rebuildList();assert(reader.visible.count==1,"The article being read remains visible until moving on")
   reader.selected=nil
+  reader.persist();let restored=LeafReader();restored.applyState(reader.store.state);assert(restored.read.contains("a") && restored.read.contains("b"),"Read status persists independently of refreshed feed content")
   reader.currentFilter="all";reader.rebuildList();assert(reader.visible.count==2,"Read history remains available explicitly")
   reader.contextArticle=b;reader.contextToggleRead();assert(!reader.read.contains("b"));assert(reader.read.contains("a"),"Context action must affect its own article")
   reader.currentFilter="unread";reader.showUnreadAfterMarkAll();assert(reader.visible.count==1,"Partial completion preserves unread articles")
