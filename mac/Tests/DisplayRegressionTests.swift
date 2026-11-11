@@ -19,6 +19,9 @@ import WebKit
   assert((reader.savedMeta["later"] as? [String:Any])?["feed"] as? String=="https://example.com/new.rss")
   assert(reader.feeds[0]["folderPath"] as? [String]==["News","India"])
   reader.feeds[0]["url"]="https://example.com/rss";reader.saved=[];reader.savedMeta=[:]
+  let publicPost:[String:Any] = ["feed":"https://author.substack.com/feed","feedBlocks":(0..<3).map{["type":"p","text":String(repeating:"Public text. ",count:50)+String($0)]}]
+  assert(reader.publicationFeedBody(publicPost) != nil)
+  var paidPost=publicPost;paidPost["restricted"]=true;assert(reader.publicationFeedBody(paidPost)==nil)
   assert(reader.refreshIsDue(now:Date(timeIntervalSince1970:10000)))
   reader.lastRefresh=Date();assert(!reader.refreshIsDue());reader.refreshMinutes=0;assert(!reader.refreshIsDue(now:Date().addingTimeInterval(86400)));reader.refreshMinutes=15
   reader.acceptFeedItems([["id":"first","title":"Old headline","feedBlocks":[["type":"p","text":"Body must not persist"]]]],feed:reader.feeds[0])

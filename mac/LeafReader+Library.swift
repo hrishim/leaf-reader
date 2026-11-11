@@ -28,6 +28,7 @@ extension LeafReader {
  }
  func applyFeedAddressUpdates(_ updates:[String:String]){
   var changed=false
+  for i in feeds.indices where feeds[i]["url"] as? String=="https://www.economist.com/latest/rss.xml" && feeds[i]["name"] as? String=="Latest Updates"{feeds[i]["name"]="The Economist";changed=true}
   for i in feeds.indices{guard let old=feeds[i]["url"] as? String,let next=updates[old],next.hasPrefix("https://") else{continue};feeds[i]["url"]=next;if currentScope==old{currentScope=next};for (id,value) in savedMeta{if var metadata=value as? [String:Any],metadata["feed"] as? String==old{metadata["feed"]=next;savedMeta[id]=metadata}};changed=true}
   if changed{var seen=Set<String>();feeds=feeds.filter{seen.insert($0["url"] as? String ?? "").inserted};do{try store.save(stateObject())}catch{alert("Could not update feed addresses",error.localizedDescription)}}
  }

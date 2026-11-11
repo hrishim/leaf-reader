@@ -67,3 +67,7 @@ Next: user trials of the local app; fix concrete reported issues. Sync, multi-us
 ## Read headline appearance — 11 November
 
 Version 1.8.1 dims read article rows to 55 percent opacity, regular-weight secondary-color headlines. Marking unread restores prominence. Scoped All Read remains; Unread clears read rows, All Items keeps dimmed rows. Reeder Item menu exposes Mark All as Read. Native display regression suite passes, including read/unread appearance assertions.
+
+## Substack Reader recovery — 11 November
+
+Version 1.8.2 refetches a Substack feed when a restored headline has no body, uses available public feed text and falls back to page extraction when needed. Existing stale-request guards remain. Economist feed label migrates from Latest Updates to The Economist. Native display suite passes. Two installed copies were found running, with Reader Off selected. Substack Chrome session is signed out; complete account subscription import remains pending user sign-in, not delivered. Gmail newsletter history is not a complete current subscription list.
