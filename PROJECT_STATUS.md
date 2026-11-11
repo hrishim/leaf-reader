@@ -71,3 +71,7 @@ Version 1.8.1 dims read article rows to 55 percent opacity, regular-weight secon
 ## Substack Reader recovery — 11 November
 
 Version 1.8.2 refetches a Substack feed when a restored headline has no body, uses available public feed text and falls back to page extraction when needed. Existing stale-request guards remain. Economist feed label migrates from Latest Updates to The Economist. Native display suite passes. Two installed copies were found running, with Reader Off selected. Substack Chrome session is signed out; complete account subscription import remains pending user sign-in, not delivered. Gmail newsletter history is not a complete current subscription list.
+
+## Substack Reader repair — 11 November
+
+Version 1.8.3 fixes XML field priority: full content:encoded now wins over earlier description teasers. Available Substack feed text displays in Reader mode, with short excerpts labelled. Verified on the installed Mac app. Native display suite, 13 actual WebKit assertions and 37 Node tests pass. Public feed subscriptions were imported through reviewed OPML into the local Substack folder; this is a one-time import, not account synchronization. Personal OPML remains outside Git. User asked to leave the magazine aside; no further work on it. Installed app: Outputs/NativeReader/Leaf Reader.app; package Leaf-Reader-Mac-1.8.3.zip. The prior pending-sign-in status is superseded.

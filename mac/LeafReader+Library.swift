@@ -3,8 +3,9 @@ import AppKit
 struct LeafSidebarRow { var title:String;var kind:String;var feedIndex:Int?;var path:[String]=[] }
 extension LeafReader {
  func publicationFeedBody(_ article:[String:Any])->[String:Any]?{
-  guard article["restricted"] as? Bool != true,let feed=article["feed"] as? String,let host=URL(string:feed)?.host,(host.hasSuffix(".substack.com") || host=="www.hindutamil.in" || host=="hindutamil.in"),let blocks=article["feedBlocks"] as? [[String:Any]],blocks.filter({$0["type"] as? String=="p"}).count>=3,blocks.compactMap({$0["text"] as? String}).joined().count>=1400 else{return nil}
-  return ["blocks":blocks,"status":"feed-text","message":"Article text supplied in the publisher’s feed."]
+  guard article["restricted"] as? Bool != true,let feed=article["feed"] as? String,let host=URL(string:feed)?.host,(host.hasSuffix(".substack.com") || host=="www.hindutamil.in" || host=="hindutamil.in"),let blocks=article["feedBlocks"] as? [[String:Any]],!blocks.isEmpty else{return nil}
+  let short=blocks.compactMap{$0["text"] as? String}.joined().count<1400
+  return ["blocks":blocks,"status":short ? "feed-only":"feed-text","message":short ? "Available text supplied in the publisher’s feed. It may be an excerpt; open the heading for the original.":"Article text supplied in the publisher’s feed."]
  }
  var refreshChoices:[Int]{[0,5,15,30,60]}
  func refreshIsDue(now:Date=Date())->Bool{ready && refreshMinutes>0 && loading==0 && loadQueue.isEmpty && now.timeIntervalSince(lastRefresh)>=Double(refreshMinutes*60)}
