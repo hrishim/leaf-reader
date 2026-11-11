@@ -63,3 +63,7 @@ Next: user trials of the local app; fix concrete reported issues. Sync, multi-us
 - Keep one coordinating chat (Find Leaf Reader chat) and one canonical repository. Additional chats should read this handover first and record their verified outcome here.
 - After changes, record date, source chat, commit/artifact, tests, remaining gaps and next action. Resolve conflicts with the latest explicit user instruction.
 - Preserve original histories. Available chat-management tools do not provide a merge operation; do not edit internal conversation databases or promise automatic two-way history synchronization.
+
+## Read headline appearance — 11 November
+
+Version 1.8.1 dims read article rows to 55 percent opacity, regular-weight secondary-color headlines. Marking unread restores prominence. Scoped All Read remains; Unread clears read rows, All Items keeps dimmed rows. Reeder Item menu exposes Mark All as Read. Native display regression suite passes, including read/unread appearance assertions.

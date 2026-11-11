@@ -29,6 +29,12 @@ import WebKit
   reader.persist();let cached=LeafReader();cached.applyState(reader.store.state);assert(cached.articles.count==2 && cached.read.contains("first"));assert(cached.refreshMinutes==15)
   reader.currentScope="@folder:[\"News\"]";assert(reader.inScope(a));reader.currentScope="https://other.example/rss";assert(!reader.inScope(a));reader.currentScope=""
   assert(reader.sidebarRows.contains{$0.kind=="folder"});let mapped=reader.sidebarRows.firstIndex{$0.feedIndex==0}!;assert(reader.feedIndex(at:mapped)==0)
+  reader.articles=[a,b];reader.currentFilter="all";reader.read=["a"];reader.rebuildList()
+  let readCell=reader.tableView(reader.list,viewFor:nil,row:0)!
+  let unreadCell=reader.tableView(reader.list,viewFor:nil,row:1)!
+  assert(readCell.alphaValue==0.55 && unreadCell.alphaValue==1,"Read headlines must dim while unread headlines stay prominent")
+  reader.read.remove("a");reader.rebuildList()
+  assert(reader.tableView(reader.list,viewFor:nil,row:0)!.alphaValue==1,"Mark unread must restore the normal appearance")
   reader.articles=[a,b];reader.read=["a","b"];reader.selected=a;reader.articleBlocks=[["type":"p","text":"STALE ARTICLE MUST DISAPPEAR"]];reader.bodyStatus="loading";reader.fetchSerial=41;reader.search.stringValue="First"
   reader.changeReadingSettings(size:32,interfaceSize:18,font:"sans",spacing:1.5,title:1.8,theme:"light")
   assert(reader.store.state["fontSize"] as? Int==32)
