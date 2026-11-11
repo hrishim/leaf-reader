@@ -1,6 +1,10 @@
 import Foundation
 @main struct StoreTests {
  static func main() throws {
+  assert((try? ReaderNetwork.feedInput(" krishnants.substack.com "))=="https://krishnants.substack.com/feed")
+  assert((try? ReaderNetwork.feedInput("https://author.substack.com/p/a-post"))=="https://author.substack.com/feed")
+  assert((try? ReaderNetwork.feedInput("https://custom.example/feed"))=="https://custom.example/feed")
+  assert((try? ReaderNetwork.feedInput("https://substack.com/@somebody"))==nil)
   let root=URL(fileURLWithPath:ProcessInfo.processInfo.environment["READER_TEST_DIR"]!).appendingPathComponent(UUID().uuidString)
   let s=try ReaderStore(directory:root),now=Date(timeIntervalSince1970:1_800_000_000),article:[String:Any]=["blocks":[["type":"p","text":"Offline fixture"]]]
   assert(s.retentionDays==0);try s.keep("saved",article:article);assert(s.body("saved") != nil)

@@ -1,6 +1,14 @@
 import Foundation
 
 final class ReaderNetwork:NSObject,URLSessionTaskDelegate {
+    static func feedInput(_ raw:String)throws->String{
+        let text=raw.trimmingCharacters(in:.whitespacesAndNewlines)
+        let address=text.contains("://") ? text:"https://"+text
+        let url=try validated(address)
+        if ["substack.com","www.substack.com"].contains(url.host?.lowercased() ?? ""){throw failure("Paste the author's publication website, such as author.substack.com, rather than a Substack profile or your home feed.")}
+        if url.host?.lowercased().hasSuffix(".substack.com")==true{var parts=URLComponents(url:url,resolvingAgainstBaseURL:false)!;parts.scheme="https";parts.path="/feed";parts.query=nil;parts.fragment=nil;return parts.url!.absoluteString}
+        return url.absoluteString
+    }
     lazy var session:URLSession={let config=URLSessionConfiguration.ephemeral;config.timeoutIntervalForRequest=20;config.timeoutIntervalForResource=35;config.httpCookieStorage=nil;config.urlCache=nil;return URLSession(configuration:config,delegate:self,delegateQueue:nil)}()
     static func validated(_ raw:String)throws->URL{guard let url=URL(string:raw),let scheme=url.scheme,["https","http"].contains(scheme),let host=url.host?.lowercased(),host.contains("."),url.user==nil,url.password==nil,(url.port==nil || url.port==80 || url.port==443),!host.contains(":"),!host.hasSuffix(".local"),!host.hasSuffix(".internal"),host != "localhost",host.range(of:"^\\d+(\\.\\d+){3}$",options:.regularExpression)==nil else{throw failure("Use a public HTTP or HTTPS feed URL without credentials.")};let keys=URLComponents(url:url,resolvingAgainstBaseURL:false)?.queryItems?.map{$0.name.lowercased()} ?? [];if keys.contains(where:{["token","auth","key","access_token","signature"].contains($0)}){throw failure("Private feed tokens are excluded.")};return url}
     static func failure(_ text:String)->NSError{NSError(domain:"ReaderNetwork",code:1,userInfo:[NSLocalizedDescriptionKey:text])}

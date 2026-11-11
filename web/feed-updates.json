@@ -1,0 +1,10 @@
+{
+  "http://9to5mac.com/category/mac/feed/": "https://9to5mac.com/guides/mac/feed/",
+  "https://9to5mac.com/category/mac/feed/": "https://9to5mac.com/guides/mac/feed/",
+  "http://swarajyamag.com/feed/": "https://swarajyamag.com/stories.rss",
+  "https://swarajyamag.com/feed/": "https://swarajyamag.com/stories.rss",
+  "https://www.newindianexpress.com/Cities/Bengaluru/rssfeed/?id=182&getXmlFeed=true": "https://www.newindianexpress.com/api/v1/collections/bengaluru-cities.rss?id=182&getXmlFeed=true",
+  "https://www.newindianexpress.com/States/Tamil-Nadu/rssfeed/?id=177&getXmlFeed=true": "https://www.newindianexpress.com/api/v1/collections/tamil-nadu-states.rss?id=177&getXmlFeed=true",
+  "https://www.newindianexpress.com/cities/bengaluru/": "https://www.newindianexpress.com/api/v1/collections/bengaluru-cities.rss?id=182&getXmlFeed=true",
+  "https://www.newindianexpress.com/states/tamil-nadu/": "https://www.newindianexpress.com/api/v1/collections/tamil-nadu-states.rss?id=177&getXmlFeed=true"
+}

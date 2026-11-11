@@ -11,6 +11,22 @@ import WebKit
   let a:[String:Any] = ["id":"a","title":"First","url":"https://example.com/a","feed":"https://example.com/rss"]
   let b:[String:Any] = ["id":"b","title":"Second","url":"https://example.com/b","feed":"https://example.com/rss"]
   reader.feeds=[["name":"Feed A","url":"https://example.com/rss","folderPath":["News","India"]]]
+  reader.read=["old-article"];reader.saved=["later"];reader.savedMeta=["later":["id":"later","feed":"https://example.com/rss"]];reader.currentScope="https://example.com/rss"
+  reader.applyFeedAddressUpdates(["https://example.com/rss":"https://example.com/new.rss"])
+  assert(reader.feeds[0]["url"] as? String=="https://example.com/new.rss")
+  assert(reader.currentScope=="https://example.com/new.rss")
+  assert(reader.read.contains("old-article") && reader.saved.contains("later"))
+  assert((reader.savedMeta["later"] as? [String:Any])?["feed"] as? String=="https://example.com/new.rss")
+  assert(reader.feeds[0]["folderPath"] as? [String]==["News","India"])
+  reader.feeds[0]["url"]="https://example.com/rss";reader.saved=[];reader.savedMeta=[:]
+  assert(reader.refreshIsDue(now:Date(timeIntervalSince1970:10000)))
+  reader.lastRefresh=Date();assert(!reader.refreshIsDue());reader.refreshMinutes=0;assert(!reader.refreshIsDue(now:Date().addingTimeInterval(86400)));reader.refreshMinutes=15
+  reader.acceptFeedItems([["id":"first","title":"Old headline","feedBlocks":[["type":"p","text":"Body must not persist"]]]],feed:reader.feeds[0])
+  reader.read.insert("first")
+  reader.acceptFeedItems([["id":"second","title":"New post"]],feed:reader.feeds[0])
+  assert(reader.articles.count==2 && reader.read.contains("first"),"New feed posts must not reset old read markers or drop older headlines")
+  assert(reader.cachedHeadlines().allSatisfy{($0["feedBlocks"] as? [[String:Any]])?.isEmpty==true},"Ordinary article bodies must not be persisted")
+  reader.persist();let cached=LeafReader();cached.applyState(reader.store.state);assert(cached.articles.count==2 && cached.read.contains("first"));assert(cached.refreshMinutes==15)
   reader.currentScope="@folder:[\"News\"]";assert(reader.inScope(a));reader.currentScope="https://other.example/rss";assert(!reader.inScope(a));reader.currentScope=""
   assert(reader.sidebarRows.contains{$0.kind=="folder"});let mapped=reader.sidebarRows.firstIndex{$0.feedIndex==0}!;assert(reader.feedIndex(at:mapped)==0)
   reader.articles=[a,b];reader.read=["a","b"];reader.selected=a;reader.articleBlocks=[["type":"p","text":"STALE ARTICLE MUST DISAPPEAR"]];reader.bodyStatus="loading";reader.fetchSerial=41;reader.search.stringValue="First"

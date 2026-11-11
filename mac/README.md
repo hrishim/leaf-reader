@@ -1,25 +1,23 @@
-# Native reader working build
+# Leaf Reader for Mac
 
-Standalone AppKit application for macOS 14 or newer. Swift handles networking and local files. The bundled Mozilla Readability engine runs against inert publisher HTML in a nonpersistent WebKit document. No server, Node runtime, OpenAI account, API key or ChatGPT sign-in is required by the native app.
+Standalone local reader for macOS 14 or newer, built for Apple Silicon and Intel. No server, account, ChatGPT sign-in or subscription is required. Each Mac keeps its own independent library. Sync is deferred at the user's request.
 
-Build: `zsh scripts/build-mac.sh`. Builds and compiler caches use the configured external volume. The app contains its extraction scripts and default public subscriptions.
+Build with `zsh scripts/build-mac.sh` on the configured external Samsung T7. The script verifies its volume UUID and produces `build/Leaf Reader.app`, with the existing Leaf logo and a universal executable. The app is ad-hoc signed, not Apple notarized; another Mac may require approval through macOS security settings. Intel compilation is verified, but physical Intel hardware has not been tested.
 
-## Storage
+## Subscriptions and new posts
 
-Live library: `~/Library/Application Support/LeafReader/`. Subscriptions and read status are saved atomically in `state.json`. Merely opening an article does not save its body. Read Later saves extracted text locally; images remain remote. Marking Read removes it from Read Later and deletes the body by default. Article Storage settings offer 0, 1, 7, 14 or 30 days of post-read retention. The store clamps any setting to 0–30. Retained bodies expire from their read date. Reducing retention shortens existing expiry; increasing it does not extend previously stored bodies. Expired bodies are purged on launch, on access, on refresh and every minute while the app is running. A closed app cannot execute cleanup until next launch.
+Use Add Feed for RSS, Atom, website discovery or a Substack publication URL. Use Subscriptions & Import for reviewed OPML import/export, folders and organization. Fresh installations start empty; existing subscriptions and read markers are preserved. A Substack profile URL is not a publication feed.
 
-iCloud synchronization is deferred. This build explicitly reports local storage and does not claim to sync. Apple Developer signing and iCloud provisioning remain future work if developer access becomes available.
+New posts are checked every 15 minutes by default while the app is open and the Mac is awake. Settings offers manual, 5, 15, 30 or 60 minutes. Launch, activation and wake also check when due. Closed or sleeping apps cannot fetch posts. Read markers persist across refresh and restart. Up to 200 headline records per feed are retained; normal article bodies are not kept in the headline cache.
+
+Public publisher text can be read inside Leaf Reader. Publisher-marked subscriber-only posts retain their headline and open in the browser for access with the user's subscription. Leaf Reader does not unlock paywalls or import browser login cookies. Feed availability and completeness depend on each publisher.
+
+## Storage and reading
+
+Live library: `~/Library/Application Support/LeafReader/`. Subscriptions, settings and read markers are saved atomically. Read Later retains extracted text locally; images remain remote. Mark Read removes Read Later and deletes its body by default. Optional post-read body retention is capped at 30 days. Reducing retention shortens existing expiry; increasing it does not extend stored bodies. Cleanup runs on launch, access, refresh and each minute while running.
+
+Settings covers article typography, interface appearance, reading behavior, refresh, storage, mail/browser choices and subscriptions. Bottom filters are Read Later, Unread and All Items. Mark All Read clears the selected article in the marked scope. Context menus provide article and feed actions. Leaf controls share available article text; mail creates a draft rather than sending automatically.
 
 ## Validation
 
-`mac/Tests/StoreTests.swift` verifies immediate deletion, cap enforcement, expiry, Read Later preservation, shortening retention, reopening the library, public URL checks, OPML nested imports/deduplication/private token rejection, escaped export roundtrip, malformed XML, wrong format and oversized imports.
-
-`mac/Tests/EngineTests.swift` runs `engine-tests.js` in actual WebKit: RSS full text, safe blocks, Atom escaped HTML, relative discovery, empty feed, paid article rejection, partial extraction warning and public Substack filtering.
-
-Manual app tests cover direct feed loading without login, full Swiggy extraction, Read Later persistence across restart, removal from Read Later and disk after marking Read, retention choices, nested OPML import and live Atom/Substack feeds.
-
-## Limits
-
-The local app is ad-hoc signed, not notarized or App Store distributed. It is a tested working build, not a claim of universal extraction correctness. Publisher layouts, feeds, restrictions and availability vary. Swarajya's current feed returns no public entries and is flagged; New Indian Express uses public section headlines because its old RSS URLs fail. Paid content is excluded when the publisher marks it as restricted. Email creates a draft through the configured mail app; it does not send messages automatically. Full offline image archives, cloud sync and native iPhone/iPad apps are not implemented.
-
-Final name and logo remain undecided. Web app work is deferred.
+Node tests cover shared reading behavior. Native store tests cover persistence, retention, feed URL validation and OPML. Actual WebKit engine tests cover RSS/Atom, Substack discovery, empty feeds, paid metadata, safe blocks and partial extraction. Display regressions cover rendered typography, saved settings, Mark All Read clearing, late extraction cancellation, history and context marking. Live publisher feeds were checked separately; these checks do not guarantee every publisher's future extraction or availability.

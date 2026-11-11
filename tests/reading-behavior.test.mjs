@@ -5,7 +5,7 @@ import fs from 'node:fs';
 function reader(initial='{"feeds":[]}'){
  const nodes=new Map(),storage=new Map([['leaf-v1',initial],['leaf-reader-mode','off']]);
  const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{textContent:'',innerHTML:'',value:'',dataset:{},style:{},classList:{toggle(){},contains(){return false},remove(){}},setAttribute(){},showModal(){},close(){}});return nodes.get(selector)};
- const context=vm.createContext({document:{querySelector:node,body:{dataset:{},classList:{remove(){}}}},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout:()=>0,clearTimeout(){},navigator:{},window:{addEventListener(){}},leafOpenSettings(){},leafApplyPreferences(){},leafPreferences:{},leafApi:async()=>({items:[]}),readerFeedArticle:()=>null,URL,Date,console,confirm:()=>true});
+ const context=vm.createContext({document:{querySelector:node,body:{dataset:{},classList:{remove(){}}}},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout:()=>0,clearTimeout(){},navigator:{},window:{addEventListener(){}},leafOpenSettings(){},leafApplyPreferences(){},leafPreferences:{},AbortSignal,leafApi:async()=>({items:[]}),readerFeedArticle:()=>null,URL,Date,console,confirm:()=>true});
  vm.runInContext(fs.readFileSync('web/library-model.js','utf8'),context);
  vm.runInContext(fs.readFileSync('web/reader.js','utf8'),context);
  return {run:s=>vm.runInContext(s,context),nodes,storage};
@@ -39,4 +39,22 @@ test('bottom menu switches between Read Later, Unread and All Items',()=>{
  r.nodes.get('#bottomSaved').onclick();assert.equal(r.run('filter'),'saved');assert.equal(r.run('merged().filter(match).map(a=>a.id).join()'),'a');
  r.nodes.get('#bottomUnread').onclick();assert.equal(r.run('merged().filter(match).map(a=>a.id).join()'),'b');
  r.nodes.get('#bottomAll').onclick();assert.equal(r.run('merged().filter(match).length'),2);
+});
+
+test('corrected feed addresses preserve read markers, saved articles, folders and scope across restart',async()=>{
+ const r=reader();
+ r.run(`feeds=[{name:'Tamil Nadu',url:'https://old.example/rss',folderPath:['News']}];scope=feeds[0].url;read.add('already-read');saved.add('later');savedMeta={later:{id:'later',feed:scope}};fetch=async()=>({ok:true,json:async()=>({'https://old.example/rss':'https://new.example/rss'})});`);
+ await r.run('migrateFeedAddresses()');
+ const state=JSON.parse(r.storage.get('leaf-v1'));
+ assert.equal(state.feeds[0].url,'https://new.example/rss');
+ assert.deepEqual(state.feeds[0].folderPath,['News']);
+ assert.equal(state.scope,'https://new.example/rss');
+ assert.equal(state.savedMeta.later.feed,'https://new.example/rss');
+ assert.ok(state.read.includes('already-read'));assert.ok(state.saved.includes('later'));
+ const restarted=reader(JSON.stringify(state));assert.equal(restarted.run("read.has('already-read')"),true);
+});
+
+test('offline feed migration leaves existing subscriptions and reading state usable',async()=>{
+ const r=reader();r.run(`feeds=[{name:'Feed',url:'https://old.example/rss'}];read.add('read');fetch=async()=>{throw Error('offline')};`);
+ await r.run('migrateFeedAddresses()');assert.equal(r.run('feeds[0].url'),'https://old.example/rss');assert.equal(r.run("read.has('read')"),true);
 });
