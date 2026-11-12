@@ -75,3 +75,7 @@ Version 1.8.2 refetches a Substack feed when a restored headline has no body, us
 ## Substack Reader repair — 11 November
 
 Version 1.8.3 fixes XML field priority: full content:encoded now wins over earlier description teasers. Available Substack feed text displays in Reader mode, with short excerpts labelled. Verified on the installed Mac app. Native display suite, 13 actual WebKit assertions and 37 Node tests pass. Public feed subscriptions were imported through reviewed OPML into the local Substack folder; this is a one-time import, not account synchronization. Personal OPML remains outside Git. User asked to leave the magazine aside; no further work on it. Installed app: Outputs/NativeReader/Leaf Reader.app; package Leaf-Reader-Mac-1.8.3.zip. The prior pending-sign-in status is superseded.
+
+## Startup subscription visibility — 12 November
+
+User reported Substack feeds missing in Leaf Reader. Live state retained all five intended feeds. The saved scope was a feed in the Substack folder with Unread active; read items were filtered out. Startup did not restore sidebar selection or scroll the selected feed into view. Version 1.8.4 reveals and selects the saved feed, expands its parent folder as needed, retains the selection across refresh, and explains empty unread lists with an All Items instruction. Native display regression verifies selected feed restoration and folder expansion. User library read markers are preserved.

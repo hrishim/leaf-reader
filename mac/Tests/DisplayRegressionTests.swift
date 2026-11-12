@@ -32,6 +32,9 @@ import WebKit
   reader.persist();let cached=LeafReader();cached.applyState(reader.store.state);assert(cached.articles.count==2 && cached.read.contains("first"));assert(cached.refreshMinutes==15)
   reader.currentScope="@folder:[\"News\"]";assert(reader.inScope(a));reader.currentScope="https://other.example/rss";assert(!reader.inScope(a));reader.currentScope=""
   assert(reader.sidebarRows.contains{$0.kind=="folder"});let mapped=reader.sidebarRows.firstIndex{$0.feedIndex==0}!;assert(reader.feedIndex(at:mapped)==0)
+  reader.currentScope="https://example.com/rss";reader.collapsedFolders=["News / India"];reader.restoreSidebarScope()
+  assert(!reader.collapsedFolders.contains("News / India"));assert(reader.feedIndex(at:reader.sidebar.selectedRow)==0,"Startup must reveal and select the saved feed")
+  reader.currentScope="";reader.currentFilter="unread";reader.restoreSidebarScope();assert(reader.sidebarRows[reader.sidebar.selectedRow].kind=="unread")
   reader.articles=[a,b];reader.currentFilter="all";reader.read=["a"];reader.rebuildList()
   let readCell=reader.tableView(reader.list,viewFor:nil,row:0)!
   let unreadCell=reader.tableView(reader.list,viewFor:nil,row:1)!

@@ -12,4 +12,3 @@ check(readerParseFeed('<html><head><title>Author</title></head><body>Publication
 check(readerParseFeed('<html><head><meta name="generator" content="Substack"></head></html>','https://custom.example/').discover==='https://custom.example/feed','Custom Substack domain discovery');
 if(ciplaHTML){const cipla=readerParseArticle(ciplaHTML,'https://www.thehindubusinessline.com/companies/cipla');check(cipla.blocks.some(b=>b.text?.includes('Drug major Cipla')),'Actual Cipla opening');check(cipla.blocks.some(b=>b.text?.includes('The inspection concluded with zero')),'Actual Cipla last paragraph');check(!cipla.blocks.some(b=>/^[-+−]?[\d,.\s]+$/.test(b.text||'')),'Actual Cipla has no ticker-only blocks')}
 return 'PASS: '+count+' WebKit engine assertions (RSS, Atom, discovery, empty feed, paid filtering, partial text, safe blocks)';
-

@@ -40,6 +40,20 @@ extension LeafReader {
   for key in keys{if !key.isEmpty{let index=groups[key]!.first!;let path=feeds[index]["folderPath"] as? [String] ?? [];rows.append(LeafSidebarRow(title:(collapsedFolders.contains(key) ? "▸ ":"▾ ")+key,kind:"folder",path:path));if collapsedFolders.contains(key){continue}};for i in groups[key]!{rows.append(LeafSidebarRow(title:feeds[i]["name"] as? String ?? "Feed",kind:"feed",feedIndex:i))}}
   return rows
  }
+ func restoreSidebarScope(scroll:Bool=true){
+  if let feed=feeds.first(where:{$0["url"] as? String==currentScope}){collapsedFolders.remove((feed["folderPath"] as? [String] ?? []).joined(separator:" / "))}
+  sidebar.reloadData()
+  let row=sidebarRows.firstIndex{entry in
+   if let i=entry.feedIndex{return feeds[i]["url"] as? String==currentScope}
+   if currentScope.isEmpty{return entry.kind==currentFilter}
+   if currentScope=="@today"{return entry.kind=="today"}
+   if entry.kind=="folder",let data=try? JSONSerialization.data(withJSONObject:entry.path){return currentScope=="@folder:"+String(data:data,encoding:.utf8)!}
+   return false
+  }
+  guard let row=row else{return}
+  sidebar.delegate=nil;sidebar.selectRowIndexes(IndexSet(integer:row),byExtendingSelection:false);sidebar.delegate=self
+  if scroll{sidebar.scrollRowToVisible(row)}
+ }
  func feedIndex(at row:Int)->Int?{guard sidebarRows.indices.contains(row) else{return nil};return sidebarRows[row].feedIndex}
  func inScope(_ a:[String:Any])->Bool {
   if currentScope.isEmpty{return true}
